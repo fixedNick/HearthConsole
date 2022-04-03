@@ -11,7 +11,9 @@ namespace HearthConsole
             int width = 10;
             int height = 10;
 
-            var map = RenderMap(width, height); // Рисуем карту и получаем ее
+            // Отрисовываем карту
+            var map = RenderMap(width, height);
+            // Передаем координаты центра
             var player = new Player((int)(map.Width / 2), (int)(map.Height / 2));
             StartGame(player, map);
         }
@@ -19,7 +21,7 @@ namespace HearthConsole
         // Возвращает Map с реальным размером поля (+= 2)
         static Map RenderMap(int width, int height)
         {
-            // Границы со звездочками звездочек
+            // Границы из звездочек
             width += 2;
             height += 2;
             for (int i = 0; i < height; i++)
@@ -40,11 +42,12 @@ namespace HearthConsole
                 Console.SetCursorPosition(0, i + 1);
             }
 
-            return new Map(width, height, 2);
+            return new Map(width, height);
         }
 
         static void StartGame(Player player, Map map)
         {
+            // Ставим персонажа в центр
             Console.SetCursorPosition(player.X, player.Y);
             Console.Write('♥');
             Console.SetCursorPosition(0, player.Y + 4);
@@ -68,26 +71,31 @@ namespace HearthConsole
                     case 'd':
                         moveResult = player.Move(MoveDirection.Right, map);
                         break;
+                    case (char)ConsoleKey.Escape:
+                        ShowError(map.Height, "Thanks for game, good bye!");
+                        return;
+                    default:
+                        continue;
                 }
                 if (moveResult)
                     ShowCoords(map.Width, player);
                 else
-                    ShowError(map.Height, "Player cannot move out of map bounds");
+                    ShowError(map.Height, "Error: Player cannot move out of map bounds");
             }
         }
 
         static void ShowError(int mapHeight, string error)
         {
             Console.SetCursorPosition(0, (int)mapHeight + 1);
-            // Чистим всю строчку в консоли
+            // Чистит всю строку в консоли
             Console.MoveBufferArea(0, (int)mapHeight + 1, Console.BufferWidth, 1, Console.BufferWidth, (int)mapHeight + 1, ' ', Console.ForegroundColor, Console.BackgroundColor);
-            Console.Write($"Error: {error}");
+            Console.Write($"{error}");
         }
 
         static void ShowCoords(int mapHeight, Player p)
         {
             Console.SetCursorPosition(0, (int)mapHeight + 1);
-            // Чистим всю строчку в консоли
+            // Чистит всю строку в консоли
             Console.MoveBufferArea(0, (int)mapHeight + 1, Console.BufferWidth, 1, Console.BufferWidth, (int)mapHeight + 1, ' ', Console.ForegroundColor, Console.BackgroundColor);
             Console.Write($"Player coords: X is {p.X} & Y is {p.Y}");
         }
@@ -101,13 +109,13 @@ namespace HearthConsole
         public int MovingWidth { get; set; }
         public int MovingHeight { get; set; }
 
-        public Map(int w, int h, int gap)
+        public Map(int w, int h)
         {
             Height = h;
             Width = w;
 
-            MovingWidth = w - gap;
-            MovingHeight = h - gap;
+            MovingWidth = w - 2;
+            MovingHeight = h - 2;
         }
     }
 
